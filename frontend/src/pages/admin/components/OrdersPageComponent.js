@@ -31,19 +31,26 @@ const OrdersPageComponent = ({getOrders}) => {
             </tr>
           </thead>
           <tbody>
-            {["bi bi-check-lg text-success", "bi bi-x-lg text-danger"].map(
-              (item, idx) => (
+            {orders.map(
+              (order, idx) => (
                 <tr key={idx}>
                   <td>{idx +1}</td>
-                  <td>Mark Twain</td>
-                  <td>2022-09-12</td>
-                  <td>$124</td>
                   <td>
-                    <i className={item}></i>
+                    {order.user !== null ? (
+                      <>
+                      {order.user.name} {order.user.lastName}
+                      </> 
+                    ): null}
+                    
                   </td>
-                  <td>PayPal</td>
+                  <td>{order.createdAt.substring(0, 10)}</td>
+                  <td>{order.orderTotal.cartSubtotal}</td>
                   <td>
-                    <Link to="/admin/order-details">go to order</Link>
+                    {order.isDelivered ? <i className="bi bi-check-lg text-success"></i>: <i className="bi bi-x-lg text-danger"></i> }
+                  </td>
+                  <td>{order.paymentMethod}</td>
+                  <td>
+                    <Link to={`/admin/order-details/${order._id}`}>Go to order</Link>
                   </td>
                 </tr>
               )
