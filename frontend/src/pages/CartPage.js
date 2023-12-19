@@ -10,7 +10,7 @@ const Cart = () => {
                 <h1>Shopping Cart</h1>
                 <ListGroup variant="flush">
                 {Array.from({length: 3}).map((item, idx) => (
-                    <CartItemComponent key ={idx}/>
+                    <CartItemComponent item={{image: {path:"/img/producList/AppleWatch.jpg"}, name: "Apple watch", price: 699, count: 1, quantity: 2}} key ={idx}/>
                 ))}
                 </ListGroup>
                 

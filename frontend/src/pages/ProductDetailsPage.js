@@ -4,6 +4,8 @@ import AddedToCartMessageComponent from '../components/AddedToCartMessageCompone
 import { Rating } from 'react-simple-star-rating';
 import ImageZoom from 'js-image-zoom';
 import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart } from '../redux/action/cartActions';
 
 const ProductDetails = () => {
     let option = {
@@ -14,6 +16,14 @@ const ProductDetails = () => {
         new ImageZoom(document.getElementById("first"), option);
         new ImageZoom(document.getElementById("second"), option);
     })
+
+    //dispatch support for redux
+    const dispatch = useDispatch()
+    const addToCartHandler = () =>{
+        dispatch(addToCart())
+
+    }
+    const products = useSelector((state) => state.cart.value);
     return (<Container>
         <AddedToCartMessageComponent />
         <Row className='mt-5'>
@@ -57,7 +67,7 @@ const ProductDetails = () => {
                             </Form.Select>
                         </ListGroup.Item>
                         <ListGroup.Item>
-                            <Button variant="danger">Add to cart</Button>
+                            <Button onClick={addToCartHandler} variant="danger">Add to cart</Button>
                         </ListGroup.Item>
                         
                     </ListGroup>
