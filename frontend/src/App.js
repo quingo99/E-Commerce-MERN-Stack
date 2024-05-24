@@ -35,9 +35,12 @@ import ScrollToTop from "./utils/ScrollToTop";
 
 function App() {
   return (
+    
+
     <BrowserRouter>
       <ScrollToTop />
       <HeaderComponent />
+      <div className="main">
       <Routes>
         <Route element={<RoutesWithUserChatComponent />}>
           <Route path="/" element={<HomePage />} />
@@ -73,8 +76,10 @@ function App() {
 
         <Route path="*" element="Page not exists 404" />
       </Routes>
+      </div>
       <FooterComponent />
     </BrowserRouter>
+   
   );
 }
 

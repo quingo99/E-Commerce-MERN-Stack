@@ -2,8 +2,13 @@ import { Row, Col, Table, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import AdminLinksComponent from "../../../components/admin/AdminLinksComponent";
 import { useState, useEffect } from "react";
+import { logout } from "../../../redux/action/userActions";
+import { useDispatch } from "react-redux";
+
 
 const ProductsPageComponent = ({fecthProduct, deleteProduct}) => {
+  // apply log out for all admin components in case the token is expired so it will log out and remove all local storage and session see detail in userAction 
+  const dispatch = useDispatch()
   const [products, setProducts] = useState([]);
   const [productDeleted, setProductDeleted] = useState(false)
 
@@ -19,7 +24,10 @@ const ProductsPageComponent = ({fecthProduct, deleteProduct}) => {
     const abctrl = new AbortController();
     fecthProduct(abctrl)
       .then((res) => setProducts(res))
-      .catch((err) => setProducts([{name: err.response.data.message ? err.response.data.message : err.response.data}]));
+      .catch((err) => 
+          dispatch(logout())    
+      //setProducts([{name: err.response.data.message ? err.response.data.message : err.response.data}])
+      );
       return () => abctrl.abort();
 
   }, [productDeleted])

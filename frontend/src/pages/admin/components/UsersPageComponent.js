@@ -2,15 +2,17 @@ import { Row, Col, Table, Button } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import AdminLinksComponent from "../../../components/admin/AdminLinksComponent";
 import { useState, useEffect } from "react";
-
+import { logout } from "../../../redux/action/userActions";
+import { useDispatch } from "react-redux";
 
 const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
+    const dispatch = useDispatch()
     const [users, setUsers] = useState([]);
     const [userDeleted, setUserDeleteted] = useState(false)
     const deleteHandler = async (userId) => {
         if (window.confirm("Are you sure?")) {
             const data = await deleteUser(userId)
-            if(data === 'user removed'){
+            if (data === 'user removed') {
                 setUserDeleteted(!userDeleted);
             }
         };
@@ -20,7 +22,7 @@ const UsersPageComponent = ({ fetchUsers, deleteUser }) => {
         // first the entire html will render, then it will call useEffect and rerender html page again
         fetchUsers(abctrl)
             .then(res => setUsers(res))
-            .catch((err) => console.log(err.response.data.message ? err.response.data.message : err.response.data));
+            .catch(err => {console.log(err); dispatch(logout())})
         return () => abctrl.abort() //when exist page return will be called to disconnect database
     }, [userDeleted])
     return (

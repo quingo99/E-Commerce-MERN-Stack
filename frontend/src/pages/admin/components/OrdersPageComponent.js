@@ -2,13 +2,17 @@ import { Row, Col, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import AdminLinksComponent from "../../../components/admin/AdminLinksComponent";
 import {useEffect, useState} from "react"
+import { logout } from "../../../redux/action/userActions";
+import { useDispatch } from "react-redux";
+
 
 const OrdersPageComponent = ({getOrders}) => {
+  const dispatch = useDispatch()
   const [orders, setOrders] = useState([])
   useEffect(() => {
     getOrders()
       .then((orders) => setOrders(orders))
-      .catch((err) => console.log(err.response.data.message ? err.response.data.message : err.response.data));
+      .catch((err) => dispatch(logout()))//console.log(err.response.data.message ? err.response.data.message : err.response.data));
   }, [])
   console.log(orders)
   return (

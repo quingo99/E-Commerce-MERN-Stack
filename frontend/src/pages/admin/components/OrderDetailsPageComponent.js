@@ -11,8 +11,12 @@ import CartItemComponent from "../../../components/CartItemComponent";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import { logout } from "../../../redux/action/userActions";
+import { useDispatch } from "react-redux";
+
 const OrderDetailsPageComponent = ({ getOrder, markAsDelivered }) => {
   const { id } = useParams();
+  const dispatch = useDispatch();
 
   const [userInfo, setUserInfo] = useState({});
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -47,11 +51,12 @@ const OrderDetailsPageComponent = ({ getOrder, markAsDelivered }) => {
         setCartItems(order.cartItems);
       })
       .catch((err) =>
-        console.log(
-          err.response.data.message
-            ? err.response.data.message
-            : err.response.data
-        )
+        dispatch(logout())
+        // console.log(
+        //   err.response.data.message
+        //     ? err.response.data.message
+        //     : err.response.data
+        // )
       );
       
   }, [isDelivered, id]);

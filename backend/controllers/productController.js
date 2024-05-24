@@ -105,7 +105,7 @@ const getProducts = async (req, res, next) => {
           ...attrsQueryCondition]
       }
     }
-
+   
     //number of product perpage
     const products = await Product.find(query)
       .select(select)

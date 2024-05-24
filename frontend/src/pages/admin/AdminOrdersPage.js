@@ -8,7 +8,7 @@ const getOrders = async() => {
 
 const AdminOrdersPage = () => {
   return (
-    <OrdersPageComponent getOrders={getOrders} />
+    <OrdersPageComponent className="wrapper" getOrders={getOrders} />
   );
 };
 

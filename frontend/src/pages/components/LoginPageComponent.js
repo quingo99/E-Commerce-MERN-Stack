@@ -1,8 +1,11 @@
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Spinner from 'react-bootstrap/Spinner'
-const LoginPageComponent = ({loginUserApiRequest}) => {
+
+
+
+const LoginPageComponent = ({loginUserApiRequest, reduxDispatch, setReduxUserState }) => {
   const [validated, setValidated] = useState(false);
   const [loginUserResponseState, setLoginUserReponseState] = useState({success: "", error: "", loading: false})
 
@@ -20,6 +23,18 @@ const LoginPageComponent = ({loginUserApiRequest}) => {
         loginUserApiRequest(email, password, doNotLogOut)
         .then((res) => {
             setLoginUserReponseState({success: res.success, loading: false, error: ""})
+            if(res.userLoggedIn){
+                console.log(res.userLoggedIn)
+                reduxDispatch(setReduxUserState(res.userLoggedIn))
+            }
+            if(res.success == "user logged in" && !res.userLoggedIn.isAdmin){
+                //replace: true help get rid off login page in the history which doesn't let you to click goes back
+                //navigate("/", {replace: true}); 
+                window.location.href = '/'
+            } else{
+                //navigate("/admin/orders", {replace:true})
+                window.location.href = '/admin/orders'
+            }
         })
         .catch((err) => {setLoginUserReponseState({error: err.response.data.message ? err.response.data.message : err.response.data})});
     }
@@ -27,8 +42,11 @@ const LoginPageComponent = ({loginUserApiRequest}) => {
 
     setValidated(true);
   };
+
+  const navigate = useNavigate();
+
   return (
-    <Container>
+    <Container className="main">
       <Row className="mt-5 justify-content-md-center">
         <Col md={6}>
           <h1>Login</h1>
