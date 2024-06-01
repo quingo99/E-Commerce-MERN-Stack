@@ -64,7 +64,6 @@ const loginUser = async (req, res, next) => {
         }
         
         const user = await User.findOne({ email })
-        console.log(doNotLogOut)
         if (user && comparePasswords(password, user.password)) {
             let cookieParams = {
                 httpOnly: true,

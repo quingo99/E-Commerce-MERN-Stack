@@ -17,7 +17,7 @@ import UserProfile from "./pages/user/UserProfilePage";
 import AdminAnaLytic from "./pages/admin/AdminAnalyticsPage";
 import AdminChat from "./pages/admin/AdminChatsPage";
 import AdminCreateProduct from "./pages/admin/AdminCreateProductPage";
-import AdminEditProduct from "./pages/admin/AdminEditProductProductPage";
+import AdminEditProduct from "./pages/admin/AdminEditProductPage";
 import AdminEditUser from "./pages/admin/AdminEditUserPage";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetailsPage";
 import AdminOrder from "./pages/admin/AdminOrdersPage";
@@ -54,7 +54,7 @@ function App() {
         {/* User Route */}
         <Route element={<ProtectedRoutesComponent admin={false} />}>
           <Route path="/user/cart-details" element={<UserCartDetails />} />
-          <Route path="/user/order-details" element={<UserOrderDetails />} />
+          <Route path="/user/order-details/:id" element={<UserOrderDetails />} />
           <Route path="/user/my-profile" element={<UserProfile />} />
           <Route path="/user/my-orders" element={<UserOrders />} />
         </Route>
@@ -66,7 +66,7 @@ function App() {
             path="/admin/create-new-product"
             element={<AdminCreateProduct />}
           />
-          <Route path="/admin/edit-product" element={<AdminEditProduct />} />
+          <Route path="/admin/edit-product/:id" element={<AdminEditProduct />} />
           <Route path="/admin/edit-user" element={<AdminEditUser />} />
           <Route path="/admin/order-details/:id" element={<AdminOrderDetail />} />
           <Route path="/admin/products" element={<AdminProducts />} />

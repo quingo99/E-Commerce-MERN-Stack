@@ -22,10 +22,11 @@ const CartItemComponent = ({item, orderCreated = false, changeCount = false, rem
                         
                     </Form.Select>
                 </Col>
-
-                <Col md={3}>
+                 {orderCreated ? null : 
+                 <Col md={3}>
                     <RemoveCartComponent orderCreated={orderCreated} productId={item.productId} quantity={item.quantity} price={item.price} removeCartHandler={removeCartHandler ? removeCartHandler:undefined}/>
-                </Col>
+                </Col>}
+                
                 
             </Row>
         </ListGroup.Item>

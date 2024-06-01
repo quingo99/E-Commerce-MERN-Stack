@@ -11,6 +11,7 @@ import axios from "axios";
     const userInfo = useSelector((state) => state.userRegisterLogin.userInfo);
 
     const [user, setUser] = useState({}); 
+    
 
     const getUser = async () =>{
       try{
@@ -25,6 +26,12 @@ import axios from "axios";
       }
     }
 
+    const createOrder = async(orderData) => {
+        const {data} = await axios.post(`/api/orders`, {...orderData});
+
+        return data;
+    }
+
     useEffect(()=>{
       getUser();
     }, [])
@@ -35,7 +42,8 @@ import axios from "axios";
       <UserCartDetailsComponent
           user={user}
          cartItems={cartItems} itemCount={itemCount} cartSubtotal={cartSubtotal}
-         changecartItemQuantity={changecartItemQuantity} removeCartItem={removeCartItem} reduxDispatch={reduxDispatch} />
+         changecartItemQuantity={changecartItemQuantity} removeCartItem={removeCartItem} reduxDispatch={reduxDispatch} 
+         createOrder ={createOrder}/>
     );
   };
   

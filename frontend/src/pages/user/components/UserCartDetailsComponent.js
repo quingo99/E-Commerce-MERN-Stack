@@ -9,10 +9,17 @@ import {
   } from "react-bootstrap";
   import CartItemComponent from "../../../components/CartItemComponent";
   import { useState, useEffect } from "react";
+  import {useNavigate} from "react-router-dom";
+
   
-  const UserCartDetailsComponent = ({user, cartItems, itemCount, cartSubtotal, changecartItemQuantity, removeCartItem, reduxDispatch}) => {
+  
+  const UserCartDetailsComponent = ({user, cartItems, itemCount, cartSubtotal, changecartItemQuantity, removeCartItem, reduxDispatch, createOrder}) => {
+
+    const navigate = useNavigate();
 
     const [buttonDisabled, setButtonDisabled] = useState(false);
+    const [message, setMessage] = useState(null);
+    const [paymentMethod, setPaymentMethod] = useState("pp");
 
     const changeCount = (productId, quantity) => {
       reduxDispatch(changecartItemQuantity(productId, quantity));
@@ -27,10 +34,43 @@ import {
     useEffect(() => {
       if (!user.state || !user.address || !user.city || !user.zipCode || !user.phoneNumber) {
           setButtonDisabled(true);
+          setMessage("Please fill in all the fields in the shipping section");
       } else {
           setButtonDisabled(false);
+          setMessage(null);
       }
   }, [user]);
+
+  const orderHandler = () => {
+    const orderData = {
+      orderTotal:{
+        itemsCount: itemCount,
+        cartSubtotal: cartSubtotal,
+      },
+      cartItems: cartItems.map((item) => {
+        return{
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          image: {path: item.image ? (item.image.path ?? null) : null},
+          quantity: item.quantity,
+          count: item.count
+        }
+      }),
+      paymentMethod: paymentMethod,
+    }
+    createOrder(orderData)
+    .then(data => {
+      if(data){
+        navigate(`/user/order-details/${data._id}`);
+      }
+    })
+    .catch(err => {console.error(err)});
+  }
+
+  const choosePaymentMethod = (e) => {
+    setPaymentMethod(e.target.value);
+  }
 
     return (
       <Container fluid>
@@ -47,7 +87,7 @@ import {
               </Col>
               <Col md={6}>
                 <h2>Payment method</h2>
-                <Form.Select>
+                <Form.Select onChange={choosePaymentMethod}>
                   <option value="pp">PayPal</option>
                   <option value="cod">
                     Cash On Delivery (delivery may be delayed)
@@ -56,9 +96,8 @@ import {
               </Col>
               <Row>
                 <Col>
-                  <Alert className="mt-3" variant="danger">
-                    Not delivered. In order to make order, fill out your profile with correct address, city etc.
-                  </Alert>
+                {message ? <Alert variant="danger">{message}</Alert> : null}
+                  
                 </Col>
                 <Col>
                   <Alert className="mt-3" variant="success">
@@ -94,8 +133,8 @@ import {
               </ListGroup.Item>
               <ListGroup.Item>
                 <div className="d-grid gap-2">
-                  <Button size="lg" variant="danger" type="button" disabled={buttonDisabled}>
-                    Pay for the order
+                  <Button size="lg" variant="danger" type="button" disabled={buttonDisabled} onClick={orderHandler}>
+                    Place Order
                   </Button>
                 </div>
               </ListGroup.Item>
