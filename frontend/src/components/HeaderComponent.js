@@ -25,7 +25,7 @@ const HeaderComponent = () => {
     useEffect(() => {
         dispatch(getCategories());
     }, [dispatch])
-    
+
     return <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
         <Container>
             {/*Help go back to the main page without reloading*/}
