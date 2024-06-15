@@ -28,6 +28,8 @@ const EditProductPageComponent = ({
   updateProduct,
   reduxDispatch,
   saveAttr,
+  imageDeleteHandler,
+  uploadImageHandler
 }) => {
   const [validated, setValidated] = useState(false);
   const [product, setProduct] = useState({});
@@ -41,6 +43,9 @@ const EditProductPageComponent = ({
   const [categoryChosen, setCategoryChosen] = useState("Choose category"); // for select list [category chosen by user
   const [newAttributeKey, setNewAttributeKey] = useState(""); // for new attribute key [input field]
   const [newAttributeValue, setNewAttributeValue] = useState(""); // for new attribute value [input field]
+  const [imageRemoved, setImageRemoved] = useState(false); // for image delete [button click
+  const [imageUploading, setImageUploading] = useState(""); // for image upload [button click
+  const [isImageUpDated, setIsImageUpDated] = useState(false); // for image update [button click 
   const id = useParams().id;
   const attrVal = useRef(null);
   const attrKey = useRef(null);
@@ -191,7 +196,7 @@ const EditProductPageComponent = ({
     };
 
     fetchData();
-  }, [id]);
+  }, [id, imageRemoved, isImageUpDated]);
 
   useEffect(() => {
     if (product.category) {
@@ -402,11 +407,25 @@ const EditProductPageComponent = ({
                   product.images.map((img, idx) => (
                     <Col key={idx} style={{ position: "relative" }} xs={3}>
                       <Image src={img.path} fluid />
-                      <i style={onHover} className="bi bi-x text-danger"></i>
+                      <i style={onHover} className="bi bi-x text-danger" onClick={() => {
+                        imageDeleteHandler(img.path, id);
+                        setImageRemoved(!imageRemoved);
+                      }}></i>
                     </Col>
                   ))}
               </Row>
-              <Form.Control required type="file" multiple />
+              <Form.Control  type="file" multiple onChange={e =>{
+                setImageUploading("uploading in progress ...");
+                uploadImageHandler(e.target.files, id)
+                .then(data => {
+                  setImageUploading("uploading finished");
+                  setIsImageUpDated(!isImageUpDated);
+                })
+                .catch(err => {
+                  setImageUploading(err.response.data.message ? err.response.data.message : err.response.data);
+                })
+              }}/>
+              {imageUploading && <Alert variant="primary">{imageUploading}</Alert>}
             </Form.Group>
             <Button className="mb-5" variant="primary" type="submit">
               UPDATE
