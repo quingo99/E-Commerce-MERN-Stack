@@ -29,7 +29,7 @@ const EditProductPageComponent = ({
   reduxDispatch,
   saveAttr,
   imageDeleteHandler,
-  uploadImageHandler
+  uploadImageHandler,
 }) => {
   const [validated, setValidated] = useState(false);
   const [product, setProduct] = useState({});
@@ -45,7 +45,7 @@ const EditProductPageComponent = ({
   const [newAttributeValue, setNewAttributeValue] = useState(""); // for new attribute value [input field]
   const [imageRemoved, setImageRemoved] = useState(false); // for image delete [button click
   const [imageUploading, setImageUploading] = useState(""); // for image upload [button click
-  const [isImageUpDated, setIsImageUpDated] = useState(false); // for image update [button click 
+  const [isImageUpDated, setIsImageUpDated] = useState(false); // for image update [button click
   const id = useParams().id;
   const attrVal = useRef(null);
   const attrKey = useRef(null);
@@ -99,7 +99,9 @@ const EditProductPageComponent = ({
     e.preventDefault();
     if (e.keyCode && e.keyCode === 13) {
       if (newAttributeKey.length > 0 && newAttributeValue.length > 0) {
-        reduxDispatch(saveAttr(newAttributeKey, newAttributeValue, categoryChosen));
+        reduxDispatch(
+          saveAttr(newAttributeKey, newAttributeValue, categoryChosen)
+        );
         setAttributesTableWrapper(newAttributeKey, newAttributeValue);
         setNewAttributeKey("");
         setNewAttributeValue("");
@@ -407,25 +409,44 @@ const EditProductPageComponent = ({
                   product.images.map((img, idx) => (
                     <Col key={idx} style={{ position: "relative" }} xs={3}>
                       <Image src={img.path} fluid />
-                      <i style={onHover} className="bi bi-x text-danger" onClick={() => {
-                        imageDeleteHandler(img.path, id);
-                        setImageRemoved(!imageRemoved);
-                      }}></i>
+                      <i
+                        style={onHover}
+                        className="bi bi-x text-danger"
+                        onClick={() => {
+                          imageDeleteHandler(img.path, id)
+                            .then((data) => {
+                              setImageRemoved(!imageRemoved);
+                            })
+                            .catch((err) => {
+                              console.log(err);
+                            });
+                        }}
+                      ></i>
                     </Col>
                   ))}
               </Row>
-              <Form.Control  type="file" multiple onChange={e =>{
-                setImageUploading("uploading in progress ...");
-                uploadImageHandler(e.target.files, id)
-                .then(data => {
-                  setImageUploading("uploading finished");
-                  setIsImageUpDated(!isImageUpDated);
-                })
-                .catch(err => {
-                  setImageUploading(err.response.data.message ? err.response.data.message : err.response.data);
-                })
-              }}/>
-              {imageUploading && <Alert variant="primary">{imageUploading}</Alert>}
+              <Form.Control
+                type="file"
+                multiple
+                onChange={(e) => {
+                  setImageUploading("uploading in progress ...");
+                  uploadImageHandler(e.target.files, id)
+                    .then((data) => {
+                      setImageUploading("uploading finished");
+                      setIsImageUpDated(!isImageUpDated);
+                    })
+                    .catch((err) => {
+                      setImageUploading(
+                        err.response.data.message
+                          ? err.response.data.message
+                          : err.response.data
+                      );
+                    });
+                }}
+              />
+              {imageUploading && (
+                <Alert variant="primary">{imageUploading}</Alert>
+              )}
             </Form.Group>
             <Button className="mb-5" variant="primary" type="submit">
               UPDATE

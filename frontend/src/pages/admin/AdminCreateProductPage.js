@@ -7,18 +7,19 @@ import axios from 'axios';
     return data
   }
 
-  const uploadImageApiRequest = async (images, productId) => {
+  const uploadImagesApiRequest = async (images, productId) => {
     const formData = new FormData();
     Array.from(images).forEach(image => {
       formData.append('images', image);
     
     })
-    await axios.post(`/api/products/admin/upload?productId=${productId}`, formData);
+    const { data } = await axios.post(`/api/products/admin/upload?productId=${productId}`, formData);
+    return data
   }
   const AdminCreateProductPage = () => {
     
     return (
-      <CreateProductPageComponent createProductApiRequest={createProductApiRequest} uploadImageApiRequest={uploadImageApiRequest}/>
+      <CreateProductPageComponent createProductApiRequest={createProductApiRequest} uploadImagesApiRequest={uploadImagesApiRequest}/>
     );
   };
   

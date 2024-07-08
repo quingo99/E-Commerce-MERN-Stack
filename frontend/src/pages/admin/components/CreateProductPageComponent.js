@@ -10,36 +10,63 @@ import {
   } from "react-bootstrap";
   import { Link } from "react-router-dom";
   import { useState } from "react";
+  import { useNavigate } from "react-router-dom";
   
   const CreateProductPageComponent = ({createProductApiRequest, uploadImagesApiRequest}) => {
     const [validated, setValidated] = useState(false);
     const [attributesTable, setAttributesTable] = useState([{}]);
+    const [images, setImages] = useState(false);
+    const [imageMessageCreating, setImageMessageCreating] = useState("");
+    const [createProductResponseState, setCreateProductResponseState] = useState({message: "", error: ""});
 
+    const navigate = useNavigate();
     const handleSubmit = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const form = event.currentTarget;
-
-        const formInputs = {
-            name: form.name.value,
-            description: form.description.value,
-            count: form.count.value,
-            price: form.price.value,
-            category: form.category.value,
-            attributesTable: attributesTable
-
-        }
+      event.preventDefault();
+      event.stopPropagation();
+      const form = event.currentTarget;
+  
+      const formInputs = {
+          name: form.name.value,
+          description: form.description.value,
+          count: form.count.value,
+          price: form.price.value,
+          category: form.category.value,
+          attributesTable: attributesTable
+      };
+  
       if (form.checkValidity() === true) {
-        createProductApiRequest(formInputs)
-        .then(data => {
-          console.log(data)
-        })
-        .catch(err => {console.log(err.response.data.message ? err.response.data.message : err.response.data)})
-        
+          createProductApiRequest(formInputs)
+              .then(data => {
+                  if (images && data) {
+                      uploadImagesApiRequest(images, data.productId)
+                          .then(response => {
+                          })
+                          .catch(err => {
+                              console.error('Error in uploadImagesApiRequest:', err);
+                              setImageMessageCreating(err.response?.data?.message || err.response?.data || 'Unknown error');
+                          });
+                  }
+  
+                  if (data.message === "product created") {
+                      navigate("/admin/products");
+                  }
+              })
+              .catch(err => {
+                  console.error('Error in createProductApiRequest:', err);
+                  setCreateProductResponseState({
+                      error: err.response?.data?.message || err.response?.data || 'Unknown error'
+                  });
+              });
       }
   
       setValidated(true);
-    };
+  };
+  
+
+    const uploadHandler = (images) => {
+        setImages(images);
+
+    }
     return (
       <Container className="mb-5">
         <Row className="justify-content-md-center mt-5">
@@ -186,11 +213,17 @@ import {
               <Form.Group controlId="formFileMultiple" className="mb-3 mt-3">
                 <Form.Label>Images</Form.Label>
   
-                <Form.Control required type="file" multiple />
+                <Form.Control required type="file" multiple onChange={(e) => {
+                  uploadHandler(e.target.files)
+                }}/>
+                {imageMessageCreating && (
+                  <Alert variant="danger">{imageMessageCreating}</Alert>
+                )}
               </Form.Group>
               <Button variant="primary" type="submit">
                 Create
               </Button>
+              {createProductResponseState.error ?? ""}
             </Form>
           </Col>
         </Row>

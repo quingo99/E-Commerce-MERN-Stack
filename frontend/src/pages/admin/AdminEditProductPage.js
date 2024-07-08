@@ -15,9 +15,9 @@ const AdminEditProductPage = () => {
   const categoryList = useSelector((state) => state.categoryList.categories);
 
   const imageDeleteHandler = async (imagePath, productId) => {
-    console.log(imagePath, productId);
     let ecodeImagePath = encodeURIComponent(imagePath);
-     await axios.delete(`/api/products/admin/image/${ecodeImagePath}/${productId}`);
+    const {data} = await axios.delete(`/api/products/admin/image/${ecodeImagePath}/${productId}`);
+    return data
   }
 
   const uploadImageHandler = async (images, productId) => {

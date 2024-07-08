@@ -9,7 +9,10 @@ const port = 5050;
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors());
-app.use(fileUpload())
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: '/tmp/' // Specify the temporary directory
+}));
 
 const apiRoutes = require("./routes/apiRoutes");
 
