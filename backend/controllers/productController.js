@@ -272,27 +272,38 @@ const adminUpload = async (req, res, next) => {
       let imageId = uuidv4();
       var fileName = imageId + path.extname(image.name);
 
-      var uploadPath = uploadDirectory + "/" + fileName;
-
-      // //help move to the local path
-      // image.mv(uploadPath, function (err) {
-      //   if (err) {
-      //     return res.status(500).send(err);
-      //   }
-      // });
+      let uploadPath = "" 
+      let imagePathSave = ""
+      if(process.env.NODE_ENV === "development"){
+          uploadPath = uploadDirectory + "/" + fileName;
+          //help move to the local path
+          image.mv(uploadPath, function (err) {
+            if (err) {
+              return res.status(500).send(err);
+            }
+          });
+          imagePathSave = "/img/products/" + fileName;
+      }
+     
 
       //upload to cloudinary
-      const uploadResult = await cloudinary.uploader
+      else if(process.env.NODE_ENV === "production"){
+        const uploadResult = await cloudinary.uploader
         .upload(image.tempFilePath, { folder: "products", public_id: imageId })
         .catch((err) => {
           console.log(err);
           return res.status(500).send(err);
         });
-      console.log("public_id", uploadResult.public_id);
-      product.images.push({ path: uploadResult.secure_url });
-      await product.save();
-      return res.send("Files uploaded");
+        if (!uploadResult) {
+          imagePathSave = uploadResult.secure_url;
+        }
+      }
+      
+      product.images.push({ path: imagePathSave });
+      
     }
+    await product.save();
+    return res.send("Files uploaded");
   } catch (err) {
     console.log(err);
     next(err);

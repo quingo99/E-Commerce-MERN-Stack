@@ -367,7 +367,7 @@ const EditProductPageComponent = ({
                     onKeyUp={(e) => {
                       newAttributeKeyHandler(e);
                     }}
-                    required={newAttributeValue.length === 0}
+                    //required={newAttributeValue.length === 0}
                   />
                 </Form.Group>
               </Col>
@@ -386,7 +386,7 @@ const EditProductPageComponent = ({
                     onKeyUp={(e) => {
                       newAttributeValueHandler(e);
                     }}
-                    required={newAttributeKey.length === 0}
+                    //required={newAttributeKey.length === 0}
                   />
                 </Form.Group>
               </Col>
