@@ -13,6 +13,9 @@ import {
   import { useEffect, useState, Fragment, useRef } from "react";
   import { useParams } from "react-router-dom";
   import { useNavigate } from "react-router-dom";
+  import { useSelector } from "react-redux";
+import { set } from "../../../../../backend/routes/apiRoutes";
+
   
   const onHover = {
     cursor: "pointer",
@@ -22,8 +25,7 @@ import {
     transform: "scale(2.7)",
   };
   
-  const EditProductPageComponent = ({
-    categories,
+  const AddOrEditProductComponent = ({
     fetchProduct,
     updateProduct,
     reduxDispatch,
@@ -32,6 +34,7 @@ import {
     uploadImageHandler,
     isAddNewProduct,
   }) => {
+    const [categories, setCategories] = useState([]); // for select list [category list
     const [validated, setValidated] = useState(false);
     const [product, setProduct] = useState({});
     const [loading, setLoading] = useState(true);
@@ -44,9 +47,8 @@ import {
     const [categoryChosen, setCategoryChosen] = useState("Choose category"); // for select list [category chosen by user
     const [newAttributeKey, setNewAttributeKey] = useState(""); // for new attribute key [input field]
     const [newAttributeValue, setNewAttributeValue] = useState(""); // for new attribute value [input field]
-    const [imageRemoved, setImageRemoved] = useState(false); // for image delete [button click
     const [imageUploading, setImageUploading] = useState(""); // for image upload [button click
-    const [isImageUpDated, setIsImageUpDated] = useState(false); // for image update [button click
+    const [imageList, setImageList] = useState([]); // for image upload [button click   
     const id = useParams().id;
     const attrVal = useRef(null);
     const attrKey = useRef(null);
@@ -184,22 +186,7 @@ import {
       }
     };
   
-    useEffect(() => {
-      const fetchData = async () => {
-        await fetchProduct(id)
-          .then((data) => {
-            console.log(data);
-            setProduct(data);
-          })
-          .catch((err) => {
-            console.log(err);
-            setLoading(false);
-          });
-        setLoading(false);
-      };
-  
-      fetchData();
-    }, [id, imageRemoved, isImageUpDated]);
+    
   
     useEffect(() => {
       if (product.category) {
@@ -208,6 +195,23 @@ import {
       setCategoryChosen(product.category);
       setAttributesTable(product.attrs);
     }, [product, categories]);
+    
+    useEffect(() => {
+        const fetchdata = async () => {
+            await fetchProduct(id)
+            .then((data) => {
+              console.log(data);
+              setProduct(data);
+              setImageList(data.images);
+            })
+            const categoryList = useSelector((state) => state.categoryList.categories);
+            if (categoryList.length !== 0) {
+              setCategories(categoryList);
+              setLoading(false);
+            }
+        }
+        fetchCategories();
+    },[])
   
     if (loading) return <h1>Loading...</h1>;
   
@@ -416,7 +420,11 @@ import {
                           onClick={() => {
                             imageDeleteHandler(img.path, id)
                               .then((data) => {
-                                setImageRemoved(!imageRemoved);
+                                let imageTemp = [...imageList];
+                                imageTemp = imageTemp.filter(
+                                  (image) => image !== img.path
+                                );
+                                setImageList(imageTemp);
                               })
                               .catch((err) => {
                                 console.log(err);
@@ -434,7 +442,9 @@ import {
                     uploadImageHandler(e.target.files, id)
                       .then((data) => {
                         setImageUploading("uploading finished");
-                        setIsImageUpDated(!isImageUpDated);
+                        let imageTemp = [...imageList];
+                        imageTemp.push(data.imagePathSave);
+                        setImageList(imageTemp);
                       })
                       .catch((err) => {
                         setImageUploading(

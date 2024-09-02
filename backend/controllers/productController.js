@@ -303,7 +303,7 @@ const adminUpload = async (req, res, next) => {
       
     }
     await product.save();
-    return res.send("Files uploaded");
+    return res.send({ message: "Images uploaded successfully" , imagePathSave: imagePathSave});
   } catch (err) {
     console.log(err);
     next(err);

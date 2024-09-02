@@ -31,7 +31,6 @@ const AdminEditProductPage = () => {
 
   }
   const fetchProduct = async (id) => {
-    console.log(id);
     const { data } = await axios.get(`/api/products/get-one/${id}`);
     return data;
   };
@@ -60,6 +59,7 @@ const AdminEditProductPage = () => {
       saveAttr={saveAttr}
       imageDeleteHandler={imageDeleteHandler}
       uploadImageHandler={uploadImageHandler}
+      
     />
   );
 };
