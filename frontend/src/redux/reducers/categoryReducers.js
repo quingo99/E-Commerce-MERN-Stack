@@ -17,6 +17,11 @@ export const categoryListReducer = (state = {categories: []}, action) => {
                 ...state,
                 categories: [...state.categories, action.payload],
             }
+        case actionTypes.DELETE_CATEGORY:
+            return {
+                ...state,
+                categories: action.payload,
+            }
         default:
             return state;
     }

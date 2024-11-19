@@ -1,127 +1,208 @@
-import { Row, Col, Container, Image, ListGroup, ListGroupItem, Form, Button, Alert } from 'react-bootstrap';
-import { useParams } from 'react-router-dom'
-import AddedToCartMessageComponent from '../../components/AddedToCartMessageComponent';
-import { Rating } from 'react-simple-star-rating';
-import ImageZoom from 'js-image-zoom';
-import { useEffect, useState } from 'react';
+import {
+  Row,
+  Col,
+  Container,
+  Image,
+  ListGroup,
+  ListGroupItem,
+  Form,
+  Button,
+  Alert,
+} from "react-bootstrap";
+import { useParams } from "react-router-dom";
+import AddedToCartMessageComponent from "../../components/AddedToCartMessageComponent";
+import { Rating } from "react-simple-star-rating";
+import ImageZoom from "js-image-zoom";
+import { useEffect, useState } from "react";
 
-const ProductDetailsPageComponent = ({addToCartReduxAction, reduxDispatch}) => {
+const ProductDetailsPageComponent = ({
+  addToCartReduxAction,
+  reduxDispatch,
+  getProduct,
+  userInfo,
+}) => {
+  const { id } = useParams();
+  const [quantity, setQuantity] = useState(1);
+  const [showCartMessage, setShowCartMessage] = useState(false);
+  const [product, setProduct] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    const {id} = useParams();
-    const [quantity, setQuantity] = useState(1);
-    const [showCartMessage, setShowCartMessage] = useState(false);
-
-
-    const addToCartHandler = () => {
-        reduxDispatch(addToCartReduxAction(id, quantity));
-        setShowCartMessage(true);
-    }
-    let option = {
+  const addToCartHandler = () => {
+    reduxDispatch(addToCartReduxAction(id, quantity));
+    setShowCartMessage(true);
+  };
+  let option = {
+    scale: 2,
+    offset: { vertical: 0, horizontal: 0 },
+  };
+  useEffect(() => {
+    if (product.images) {
+      console.log("images", product.images);
+      let option = {
         scale: 2,
-        offset: {vertical: 0, horizontal: 0}
+        offset: { vertical: 0, horizontal: 0 },
+      };
+      product.images.map(
+        (item, idx) =>
+          new ImageZoom(document.getElementById(`imageId${idx + 1}`), option)
+      );
     }
-    useEffect(() =>{
-        new ImageZoom(document.getElementById("first"), option);
-        new ImageZoom(document.getElementById("second"), option);
-    })
+  });
 
-    
-    return (<Container>
-        <AddedToCartMessageComponent showCartMessage={showCartMessage} setShowCartMessage={setShowCartMessage}/>
-        <Row className='mt-5'>
-            {/*z index help to zoom image work properly*/}
-            <Col style = {{zIndex: 1}}md={4}>
-                <div id='first'>
-                    <Image crossOrigin = "anonymous" fluid src="/img/productList/AppleWatch.jpg" />
-                </div>
-                <br />
-                <div id='second'>
-                    <Image fluid src="/img/productList/Macbook.jpg" />
-                </div>
-                <br />
-                
-                
+  useEffect(() => {
+    getProduct(id)
+      .then((data) => {
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(
+          err.response.data.message
+            ? err.response.data.message
+            : err.response.data
+        );
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <Container>
+      <AddedToCartMessageComponent
+        showCartMessage={showCartMessage}
+        setShowCartMessage={setShowCartMessage}
+      />
+      <Row className="mt-5">
+        {loading ? (
+          <h2>Loading....</h2>
+        ) : error ? (
+          <h2>{error}</h2>
+        ) : (
+          <>
+            <Col style={{ zIndex: 1 }} md={4}>
+              {product.images
+                ? product.images.map((item, idx) => (
+                    <div key={id} id={`imageId${id + 1}`}>
+                      <Image
+                        crossOrigin="anonymous"
+                        fluid
+                        src={`${item.path ?? null}`}
+                      />
+                      <br />
+                    </div>
+                  ))
+                : null}
             </Col>
 
             <Col md={8}>
-                <Row>
-                    <Col md={8}>
-                        <ListGroup variant="flush">
-                            <ListGroupItem><h1>Product Name</h1></ListGroupItem>
-                            <ListGroupItem><Rating readonly size={20} initialValue={4} />(2)</ListGroupItem>
-                            <ListGroupItem>Price <span className='fw-bold'> $199</span></ListGroupItem>
-                            <ListGroup.Item>Cras justo odio</ListGroup.Item>
+              <Row>
+                <Col md={8}>
+                  <ListGroup variant="flush">
+                    <ListGroupItem>
+                      <h1>{product.name}</h1>
+                    </ListGroupItem>
+                    <ListGroupItem>
+                      <Rating
+                        readonly
+                        size={20}
+                        initialValue={product.rating}
+                      />
+                      {product.reviewsNumber}
+                    </ListGroupItem>
+                    <ListGroupItem>
+                      Price <span className="fw-bold"> ${product.price}</span>
+                    </ListGroupItem>
+                    <ListGroup.Item>{product.description}</ListGroup.Item>
+                  </ListGroup>
+                </Col>
 
-                        </ListGroup>
-                    </Col>
+                {/*Select quantity and add to cart */}
+                <Col md={4}>
+                  <ListGroup>
+                    <ListGroup.Item>
+                      Status: {product.count > 0 ? "in stock" : "out of stock"}
+                    </ListGroup.Item>
+                    <ListGroupItem>
+                      Price <span className="fw-bold"> ${product.price}</span>
+                    </ListGroupItem>
+                    <ListGroup.Item>
+                      Quantity:
+                      <Form.Select
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        size="lg"
+                        aria-label="Default select example"
+                      >
+                        {[...Array(product.count).keys()].map((x) => (
+                          <option key={x + 1} value={x + 1}>
+                            {x + 1}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Button onClick={addToCartHandler} variant="danger">
+                        Add to cart
+                      </Button>
+                    </ListGroup.Item>
+                  </ListGroup>
+                </Col>
+              </Row>
 
-                    {/*Select quantity and add to cart */}
-                    <Col md={4}><ListGroup>
-                        <ListGroup.Item>Status: in stock</ListGroup.Item>
-                        <ListGroupItem>Price <span className='fw-bold'> $199</span></ListGroupItem>
-                        <ListGroup.Item>
-                            Quantity:
-                            <Form.Select  onChange={e => setQuantity(e.target.value)} size="lg" aria-label="Default select example">
-                                <option>Choose</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                            </Form.Select>
+              {/*Customer Review */}
+              <Row>
+                <Col className="mt-5">
+                  <h5>Reviews</h5>
+                  <ListGroup variant="flush">
+                    {product.reviews &&
+                      product.reviews.map((review, idx) => (
+                        <ListGroup.Item key={idx}>
+                          {review.user.name} <br />
+                          <Rating
+                            readonly
+                            size={20}
+                            initialValue={review.rating}
+                          />
+                          <br />
+                          {review.createdAt.substring(0, 10)} <br />
+                          {review.comment} <br />
                         </ListGroup.Item>
-                        <ListGroup.Item>
-                            <Button onClick={addToCartHandler} variant="danger">Add to cart</Button>
-                        </ListGroup.Item>
-                        
-                    </ListGroup>
-                    </Col>
+                      ))}
+                  </ListGroup>
+                </Col>
+              </Row>
+              <hr />
 
-                </Row>
-
-                {/*Customer Review */}
-                <Row>
-                    <Col className='mt-5'>
-                        <h5>Reviews</h5>
-                        <ListGroup variant="flush">
-                            {Array.from({length: 10}).map((item, idx) => (
-                                <ListGroup.Item key ={idx}>Qui Ngo <br /> 
-                                    <Rating readonly size={20} initialValue={4}/> <br />
-                                    04-28-1999 <br />
-                                    The product is awesome, easy to use. However, there are still small errors during using. huhu
-                                 </ListGroup.Item>
-                            ))}
-                            
-                            
-                        </ListGroup>
-                    </Col>
-                </Row>
-                <hr />
-
-                {/*Review Form */}
-                <Alert variant="danger">Login first to write a review</Alert>
-                <Form>
-                    
-                    <Form.Group
-                        className="mb-3"
-                        controlId="exampleForm.ControlTextarea1"
-                    >
-                        <Form.Label>Write review</Form.Label>
-                        <Form.Control as="textarea" rows={3} />
-                    </Form.Group>
-                    <Form.Select aria-label="Default select example">
-                        <option>Rating</option>
-                        <option value="5">(very good)</option>
-                        <option value="4">(good)</option>
-                        <option value="3">(average)</option>
-                        <option value="2">(bad)</option>
-                        <option value="1">(awful)</option>
-                    </Form.Select>
-                    <Button className = "mb-5 mt-3" variant="primary">Submit</Button>
-                </Form>
-
+              {!userInfo.name && <Alert variant="danger">Login first to write a review</Alert>}
+              {/*Review Form */}
+              
+              <Form>
+                <Form.Group
+                  className="mb-3"
+                  controlId="exampleForm.ControlTextarea1"
+                >
+                  <Form.Label>Write review</Form.Label>
+                  <Form.Control as="textarea" rows={3} />
+                </Form.Group>
+                <Form.Select aria-label="Default select example">
+                  <option>Rating</option>
+                  <option value="5">(very good)</option>
+                  <option value="4">(good)</option>
+                  <option value="3">(average)</option>
+                  <option value="2">(bad)</option>
+                  <option value="1">(awful)</option>
+                </Form.Select>
+                <Button className="mb-5 mt-3" variant="primary">
+                  Submit
+                </Button>
+              </Form>
             </Col>
-        </Row>
-    </Container>)
-
-}
+          </>
+        )}
+        {/*z index help to zoom image work properly*/}
+      </Row>
+    </Container>
+  );
+};
 
 export default ProductDetailsPageComponent;

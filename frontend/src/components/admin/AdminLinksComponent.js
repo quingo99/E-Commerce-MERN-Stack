@@ -3,7 +3,7 @@ import { LinkContainer } from "react-router-bootstrap";
 import { logout } from "../../redux/action/userActions";
 import { useDispatch } from "react-redux";
 const AdminLinksComponent = () => {
-  const dispatch = useDispatch
+  const dispatch = useDispatch();
   return (
     <Navbar bg="light" variant="light">
       <Nav className="flex-column">

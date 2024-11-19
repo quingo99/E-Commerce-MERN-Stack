@@ -239,7 +239,7 @@ const adminUpdateProduct = async (req, res, next) => {
 
 const adminUpload = async (req, res, next) => {
   try {
-    console.log("adminUpload");
+    
     if (!req.files || !!req.files.images === false) {
       return res.status(400).send("No files were uploaded.");
     }
@@ -269,9 +269,9 @@ const adminUpload = async (req, res, next) => {
     }
 
     for (let image of imagesTable) {
+
       let imageId = uuidv4();
       var fileName = imageId + path.extname(image.name);
-
       let uploadPath = "" 
       let imagePathSave = ""
       if(process.env.NODE_ENV === "development"){
@@ -291,21 +291,20 @@ const adminUpload = async (req, res, next) => {
         const uploadResult = await cloudinary.uploader
         .upload(image.tempFilePath, { folder: "products", public_id: imageId })
         .catch((err) => {
-          console.log(err);
           return res.status(500).send(err);
         });
-        if (!uploadResult) {
+        if (uploadResult) {
           imagePathSave = uploadResult.secure_url;
         }
       }
-      
+      console.log(imagePathSave)
       product.images.push({ path: imagePathSave });
       
     }
     await product.save();
-    return res.send({ message: "Images uploaded successfully" , imagePathSave: imagePathSave});
+    console.log(product.images)
+    return res.send({ message: "Images uploaded successfully" , imagePathSave: product.images});
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };

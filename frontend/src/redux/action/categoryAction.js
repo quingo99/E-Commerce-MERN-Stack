@@ -30,10 +30,8 @@ export const saveAttr =
   };
 
 export const newCategory = (category) => async (dispatch) => {
-    console.log("category: ", category);
     try {
         const { data } = await axios.post("/api/categories", { category });
-        console.log("data: ", data.categoryCreated);
         if (data.categoryCreated) {
         dispatch({
             type: actionTypes.NEW_CATEGORY,
@@ -44,5 +42,21 @@ export const newCategory = (category) => async (dispatch) => {
         console.log(err);
     }
 }
+
+export const deleteCategory = (category) => async (dispatch) => {
+    try {
+      console.log("category: ", category);
+
+        const { data } = await axios.delete(`/api/categories/${encodeURIComponent(category)}`);
+        if (data.categoryDeleted) {
+        dispatch({
+            type: actionTypes.DELETE_CATEGORY,
+            payload: data.remainingCategories,
+        });
+        }
+    } catch (err) {
+        console.log(err);
+    }
+};
 
 

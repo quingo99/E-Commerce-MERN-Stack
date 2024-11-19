@@ -16,13 +16,15 @@ const CreateProductPageComponent = ({
   createProductApiRequest,
   uploadImagesApiRequest,
   categories,
+  setCategories,
   categoryData,
   reduxDispatch,
   saveAttr,
   newCategory,
+  deleteCategory,
 }) => {
   const [validated, setValidated] = useState(false);
-  const [attributesTable, setAttributesTable] = useState([{}]);
+  const [attributesTable, setAttributesTable] = useState([]);
   const [images, setImages] = useState(false);
   const [imageMessageCreating, setImageMessageCreating] = useState("");
   const [createProductResponseState, setCreateProductResponseState] = useState({
@@ -172,6 +174,10 @@ const CreateProductPageComponent = ({
       }
     }
   };
+  const attributeValueSelected = (e) => {
+    if (e.target.value === "Choose attribute value") return;
+    setAttributesTableWrapper(attrKey.current.value, e.target.value);
+  };
 
   const setAttributesTableWrapper = (attrKey, attrVal) => {
     setAttributesTable([...attributesTable, { key: attrKey, value: attrVal }]);
@@ -187,6 +193,22 @@ const CreateProductPageComponent = ({
     );
     setAttributesTable(newAttributesTable);
   };
+
+  const deleteCategoryHandler = async () => {
+    let category = choosenCategory;
+    console.log("category", category);
+    if (category === "Choose category") {
+      return;
+    }
+    await reduxDispatch(deleteCategory(category));
+
+    setCategories(categories.filter((cat) => cat.name !== category));
+    categoryData = categoryData.filter((cat) => cat.name !== category);
+  }
+
+  const checkKeyDown = (e) => {
+    if (e.keyCode === 13) e.preventDefault();
+    };
   return (
     <Container className="mb-5">
       <Row className="justify-content-md-center mt-5">
@@ -197,7 +219,7 @@ const CreateProductPageComponent = ({
         </Col>
         <Col md={6}>
           <h1>Create a new product</h1>
-          <Form noValidate validated={validated} onSubmit={handleSubmit}>
+          <Form noValidate validated={validated} onSubmit={handleSubmit} onKeyDown={(e) => checkKeyDown(e)}>
             <Form.Group className="mb-3" controlId="formBasicName">
               <Form.Label>Name</Form.Label>
               <Form.Control name="name" required type="text" />
@@ -226,7 +248,7 @@ const CreateProductPageComponent = ({
             <Form.Group className="mb-3" controlId="formBasicCategory">
               <Form.Label>
                 Category
-                <CloseButton />(<small>remove selected</small>)
+                <CloseButton onClick={deleteCategoryHandler}/>(<small>remove selected</small>)
               </Form.Label>
               <Form.Select
                 required
@@ -287,6 +309,7 @@ const CreateProductPageComponent = ({
                     name="atrrVal"
                     aria-label="Default select example"
                     ref={attrVal}
+                    onChange={attributeValueSelected}
                   >
                     <option>Choose attribute value</option>
                   </Form.Select>

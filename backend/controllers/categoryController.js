@@ -32,19 +32,32 @@ const newCategory = async (req, res, next) => {
 };
 
 const deleteCategory = async (req, res, next) => {
-  // return res.send(req.params.category)
-  try {
-    if (req.params.category !== "Choose category") {
-      const categoryExists = await Category.findOne({
-        name: decodeURIComponent(req.params.category),
-      }).orFail();
-      await Category.deleteOne({ _id: categoryExists._id });
-      res.json({ categoryDeleted: true });
+    try {
+        console.log(req.params.category); 
+      if (req.params.category !== "Choose category") {
+        // Find the category by name
+        const categoryExists = await Category.findOne({
+          name: decodeURIComponent(req.params.category),
+        }).orFail(); // Ensure the category exists or fail
+  
+        // Delete the category
+        await Category.deleteOne({ _id: categoryExists._id });
+  
+        // Fetch all remaining categories sorted by name after deletion
+        const remainingCategories = await Category.find({}).sort({ name: 'asc' });
+  
+        // Return the response with the remaining categories
+        res.json({ categoryDeleted: true, remainingCategories });
+      } else {
+        // Handle the case where "Choose category" is passed
+        res.status(400).json({ error: "Invalid category: Choose a valid category to delete" });
+      }
+    } catch (err) {
+      // Pass errors to the error handling middleware
+      next(err);
     }
-  } catch (err) {
-    next(err);
-  }
-};
+  };
+  
 
 const saveAttr = async (req, res, next) => {
   const { key, val, categoryChosen } = req.body;

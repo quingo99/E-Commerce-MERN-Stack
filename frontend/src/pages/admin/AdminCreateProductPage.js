@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { saveAttr, newCategory } from "../../redux/action/categoryAction";
+import { saveAttr, newCategory, deleteCategory } from "../../redux/action/categoryAction";
 
 const createProductApiRequest = async (formImputs) => {
   const { data } = await axios.post("/api/products/admin", { ...formImputs });
@@ -43,10 +43,12 @@ const AdminCreateProductPage = () => {
       createProductApiRequest={createProductApiRequest}
       uploadImagesApiRequest={uploadImagesApiRequest}
       categories={categories}
+      setCategories={setCategories}
       categoryData={categoryList}
       reduxDispatch={reduxDispatch}
       saveAttr={saveAttr}
       newCategory={newCategory}
+      deleteCategory={deleteCategory}
     />
   );
 };
