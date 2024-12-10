@@ -33,53 +33,84 @@ import RoutesWithUserChatComponent from "./components/user/RoutesWithUserChatCom
 //utils
 import ScrollToTop from "./utils/ScrollToTop";
 
-function App() {
-  return (
-    
+//load category
+import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { getCategories } from "./redux/action/categoryAction";
 
+function App() {
+  const dispatch = useDispatch();
+  const [isCategories, setIsCategories] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        await dispatch(getCategories());
+        setIsCategories(true);
+        console.log("Categories loaded from app.js");
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load categories. Please try again later.");
+      }
+    };
+
+    fetchCategories();
+  }, [dispatch]);
+
+  if (!isCategories) {
+    return (
+      <div>
+        {error ? (
+          <h2>{error}</h2>
+        ) : (
+          <h2>Loading...</h2>
+        )}
+      </div>
+    );
+  }
+
+  return (
     <BrowserRouter>
       <ScrollToTop />
       <HeaderComponent />
       <div className="main">
-      <Routes>
-        <Route element={<RoutesWithUserChatComponent />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/Login" element={<Login />} />
-          <Route path="/Register" element={<Register />} />
-          <Route path="/product-list" element={<ProductList />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/product-details/:id" element={<ProductDetails />} />
-        </Route>
+        <Routes>
+          <Route element={<RoutesWithUserChatComponent />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/Login" element={<Login />} />
+            <Route path="/Register" element={<Register />} />
+            <Route path="/product-list/category/:categoryName" element={<ProductList />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/product-details/:id" element={<ProductDetails />} />
+          </Route>
 
-        {/* User Route */}
-        <Route element={<ProtectedRoutesComponent admin={false} />}>
-          <Route path="/user/cart-details" element={<UserCartDetails />} />
-          <Route path="/user/order-details/:id" element={<UserOrderDetails />} />
-          <Route path="/user/my-profile" element={<UserProfile />} />
-          <Route path="/user/my-orders" element={<UserOrders />} />
-        </Route>
-        {/* Admin Route */}
-        <Route element={<ProtectedRoutesComponent admin={true} />}>
-          <Route path="/admin/analytics" element={<AdminAnaLytic />} />
-          <Route path="/admin/chats" element={<AdminChat />} />
-          <Route
-            path="/admin/create-new-product"
-            element={<AdminCreateProduct />}
-          />
-          <Route path="/admin/edit-product/:id" element={<AdminEditProduct />} />
-          <Route path="/admin/edit-user/:id" element={<AdminEditUser />} />
-          <Route path="/admin/order-details/:id" element={<AdminOrderDetail />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/orders" element={<AdminOrder />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-        </Route>
+          {/* User Routes */}
+          <Route element={<ProtectedRoutesComponent admin={false} />}>
+            <Route path="/user/cart-details" element={<UserCartDetails />} />
+            <Route path="/user/order-details/:id" element={<UserOrderDetails />} />
+            <Route path="/user/my-profile" element={<UserProfile />} />
+            <Route path="/user/my-orders" element={<UserOrders />} />
+          </Route>
 
-        <Route path="*" element="Page not exists 404" />
-      </Routes>
+          {/* Admin Routes */}
+          <Route element={<ProtectedRoutesComponent admin={true} />}>
+            <Route path="/admin/analytics" element={<AdminAnaLytic />} />
+            <Route path="/admin/chats" element={<AdminChat />} />
+            <Route path="/admin/create-new-product" element={<AdminCreateProduct />} />
+            <Route path="/admin/edit-product/:id" element={<AdminEditProduct />} />
+            <Route path="/admin/edit-user/:id" element={<AdminEditUser />} />
+            <Route path="/admin/order-details/:id" element={<AdminOrderDetail />} />
+            <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/orders" element={<AdminOrder />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+          </Route>
+
+          <Route path="*" element={<h2>Page Not Found (404)</h2>} />
+        </Routes>
       </div>
       <FooterComponent />
     </BrowserRouter>
-   
   );
 }
 

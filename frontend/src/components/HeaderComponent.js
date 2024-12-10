@@ -14,7 +14,9 @@ import {Link} from 'react-router-dom'
 import { logout } from '../redux/action/userActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { getCategories } from '../redux/action/categoryAction';
+
+
+
 
 
 const HeaderComponent = () => {
@@ -22,10 +24,7 @@ const HeaderComponent = () => {
     const {userInfo} = useSelector(state => state.userRegisterLogin);
     const itemCount = useSelector(state => state.cart.itemCount);
 
-    useEffect(() => {
-        dispatch(getCategories());
-    }, [dispatch])
-
+   
     return <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
         <Container>
             {/*Help go back to the main page without reloading*/}

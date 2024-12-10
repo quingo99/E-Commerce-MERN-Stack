@@ -1,19 +1,23 @@
-import ProductCarousel from "../components/ProductCarouselComponent"
-import CategoryComponent from "../components/CategoryComponent"
-import Row from "react-bootstrap/esm/Row"
-import Container from "react-bootstrap/esm/Container"
+import { useEffect } from "react"
+import HomePageComponent from "./components/HomePageComponent"
+import {useSelector} from "react-redux"
+import { useState } from "react"
+
 const HomePage = () => {
-    const categories = ["Laptop", "Phone", "Monitor", "Jacket", "Watch", "Shoes", "Science Book", "Romance Book"]
+    const [localCategories, setLocalCategories] = useState(null); // Local state to track categories
+    const { categories } = useSelector((state) => state.categoryList);
+
+    useEffect(() => {
+        if (categories) {
+            setLocalCategories(categories); // Update local state when categories are available
+            console.log("Categories loaded:", categories);
+        }
+    }, [categories]);
+
     return (
         <>
-            <ProductCarousel />
-            <Container>
-                <Row xs={1} md={2} className="g-4 mt-5 homePageRow">
-                    {
-                        categories.map((category, index) => (<CategoryComponent key={index} category = {category} index = {index} />))
-                    }
-                </Row>
-            </Container>
+        {localCategories  ? <HomePageComponent categories={localCategories}/> : <h2>Loading...</h2>}
+          
         </>
     )
 }

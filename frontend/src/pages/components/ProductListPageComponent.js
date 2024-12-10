@@ -8,15 +8,39 @@ import CategoryFilterComponent from "../../components/filterQueryResultOptions/C
 import AttributesFilterComponent from "../../components/filterQueryResultOptions/AttributesFilterComponent";
 import { useEffect, useState } from "react";
 
-
-const ProductListPageComponent = ({getProducts}) => {
+import {useParams} from "react-router-dom";
+const ProductListPageComponent = ({getProducts, categories}) => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [attrsFilter, setAttrsFilter] = useState([]);
+  const {categoryName} = useParams() || "";
 
+  useEffect(() => {
+    if(categoryName) {
+      let categoryAllData = categories.find((item) => item.name === categoryName.replaceAll(",", "/"))
+      if(categoryAllData){
+        let mainCategory = categoryAllData.name.split("/")[0];
+        let index = categories.findIndex((item) => item.name === mainCategory);
+        if(index !== -1){
+          setAttrsFilter(categories[index].attrs);
+        }else{
+          setAttrsFilter([]);
+        }
+      } else{
+        setAttrsFilter([]);
+      }
+    }
+  }, [categoryName, categories]);
     useEffect(() => {getProducts()
-      .then(data => setProducts(data.products))
-      .catch(err => console.log(err))}
+      .then(data => {
+        setProducts(data.products)
+        setLoading(false)
+      })
+      .catch(err => {
+        setError(true)
+      })}
     , []);
-    console.log("product: ", products);
   return (
     <Container fluid>
       <Row>
@@ -40,7 +64,7 @@ const ProductListPageComponent = ({getProducts}) => {
             </ListGroup.Item>
             
             <ListGroup.Item>
-              <AttributesFilterComponent />
+              <AttributesFilterComponent attrsFilter = {attrsFilter} />
             </ListGroup.Item>
             
             <ListGroup.Item>
@@ -51,18 +75,21 @@ const ProductListPageComponent = ({getProducts}) => {
           </ListGroup>
         </Col>
         <Col md={9}>
-          {products.map((product) => (
-            <ProductForListComponent 
-              key={product._id}
-              images = {product.images}
-              name={product.name}
-              description={product.description}
-              price={product.price}
-              rating={product.rating}
-              reviewsNumber={product.reviewsNumber}  
-              productId={product._id}          
-            />
-          ))}
+          {loading ? (<h2>Loading....</h2>) : error ? (<h2>Error while loading products</h2>) : (
+            products.map((product) => (
+              <ProductForListComponent 
+                key={product._id}
+                images = {product.images}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+                rating={product.rating}
+                reviewsNumber={product.reviewsNumber}  
+                productId={product._id}          
+              />
+            ))
+          )}
+          <br />
           
           <PaginationComponent />
         </Col>

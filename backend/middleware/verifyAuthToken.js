@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken")
 const verifyIsLoggedIn = (req, res, next) => {
     try {
-      
         const token = req.cookies.access_token
         if(!token) {
            return res.status(403).send("A token is required for authentication") 
@@ -21,7 +20,6 @@ const verifyIsLoggedIn = (req, res, next) => {
     }
 }
 const verifyIsAdmin = (req, res, next) => {
-   
     try {
         if(req.user && req.user.isAdmin){
             next()

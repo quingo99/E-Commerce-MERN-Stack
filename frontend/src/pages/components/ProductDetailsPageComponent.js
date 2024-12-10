@@ -13,13 +13,14 @@ import { useParams } from "react-router-dom";
 import AddedToCartMessageComponent from "../../components/AddedToCartMessageComponent";
 import { Rating } from "react-simple-star-rating";
 import ImageZoom from "js-image-zoom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const ProductDetailsPageComponent = ({
   addToCartReduxAction,
   reduxDispatch,
   getProduct,
   userInfo,
+  writeReviewApiRequest,
 }) => {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
@@ -27,6 +28,9 @@ const ProductDetailsPageComponent = ({
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [productReviewed, setProductReviewed] = useState("");
+
+  const messagesEndRef = useRef(null);  
 
   const addToCartHandler = () => {
     reduxDispatch(addToCartReduxAction(id, quantity));
@@ -38,7 +42,6 @@ const ProductDetailsPageComponent = ({
   };
   useEffect(() => {
     if (product.images) {
-      console.log("images", product.images);
       let option = {
         scale: 2,
         offset: { vertical: 0, horizontal: 0 },
@@ -62,9 +65,41 @@ const ProductDetailsPageComponent = ({
             ? err.response.data.message
             : err.response.data
         );
-        setLoading(false);
       });
-  }, []);
+  }, [id, productReviewed]);
+
+  useEffect(() => {
+    if(productReviewed){
+      setTimeout(() => {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      })
+    }
+  }, [productReviewed]);
+
+  const sendReviewHandler = (e) => {
+    e.preventDefault();
+    const form = e.currentTarget.elements;
+    const formInputs = {
+      comment: form.comment.value,
+      rating: form.rating.value,
+    };
+    if (e.currentTarget.checkValidity()) {
+      //send review
+     writeReviewApiRequest(product._id, formInputs)
+     .then((data) => {
+         if(data === "review created"){
+           setProductReviewed("You successfully reviewed this product");
+         }
+      })
+      .catch((err) => {
+        setError(
+          err.response.data.message
+            ? err.response.data.message
+            : err.response.data
+        );
+      });
+    }
+  };
 
   return (
     <Container>
@@ -168,31 +203,51 @@ const ProductDetailsPageComponent = ({
                           {review.comment} <br />
                         </ListGroup.Item>
                       ))}
+                      <div ref={messagesEndRef} />
                   </ListGroup>
                 </Col>
               </Row>
               <hr />
 
-              {!userInfo.name && <Alert variant="danger">Login first to write a review</Alert>}
+              {!userInfo.name && (
+                <Alert variant="danger">Login first to write a review</Alert>
+              )}
               {/*Review Form */}
-              
-              <Form>
+
+              <Form onSubmit={sendReviewHandler}>
                 <Form.Group
                   className="mb-3"
                   controlId="exampleForm.ControlTextarea1"
                 >
                   <Form.Label>Write review</Form.Label>
-                  <Form.Control as="textarea" rows={3} />
+                  <Form.Control
+                    name="comment"
+                    required
+                    as="textarea"
+                    disabled={!userInfo.name}
+                    textarea
+                    rows={3}
+                  />
                 </Form.Group>
-                <Form.Select aria-label="Default select example">
-                  <option>Rating</option>
-                  <option value="5">(very good)</option>
-                  <option value="4">(good)</option>
-                  <option value="3">(average)</option>
-                  <option value="2">(bad)</option>
-                  <option value="1">(awful)</option>
+                <Form.Select
+                  aria-label="Default select example"
+                  name="rating"
+                  required
+                  disabled={!userInfo.name}
+                >
+                  <option value="">Rating</option>
+                  <option value="5">Very good</option>
+                  <option value="4">Good</option>
+                  <option value="3">Average</option>
+                  <option value="2">Bad</option>
+                  <option value="1">Awful</option>
                 </Form.Select>
-                <Button className="mb-5 mt-3" variant="primary">
+                <Button
+                  disabled={!userInfo.name}
+                  className="mb-5 mt-3"
+                  variant="primary"
+                  type="submit"
+                >
                   Submit
                 </Button>
               </Form>

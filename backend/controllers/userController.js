@@ -132,6 +132,7 @@ const getUserProfile = async (req, res, next) => {
 }
 
 const writeReview = async (req, res, next) => {
+   
     try {
         //check whether product is reviewed by user
         const product = await Product.findById(req.params.productId).populate("reviews");
@@ -149,10 +150,10 @@ const writeReview = async (req, res, next) => {
         if (!(comment && rating)) {
             return res.status(400).send("All inputs are required");
         }
-
+       
         // create review id manually because it is needed also for saving in Product collection
         const ObjectId = require("mongodb").ObjectId;
-        let reviewId = ObjectId();
+        let reviewId = new ObjectId();
         session.startTransaction();
         await Review.create([
             {
@@ -163,6 +164,9 @@ const writeReview = async (req, res, next) => {
             }
         ],{ session: session })
 
+        await session.commitTransaction();
+        session.endSession();
+        // save review id to product collection
        
         // res.send(product)
         let prc = [...product.reviews];
@@ -176,6 +180,7 @@ const writeReview = async (req, res, next) => {
             product.rating = prc.map((item) => Number(item.rating)).reduce((sum, item) => sum + item, 0) / product.reviews.length;
         }
         product.reviewsNumber = product.reviews.length;
+        console.log(product.reviews)
         await product.save();
 
         res.send('review created')
