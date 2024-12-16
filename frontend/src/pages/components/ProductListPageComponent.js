@@ -1,4 +1,4 @@
-import { Row, Col, Container, ListGroup, Button } from "react-bootstrap";
+import { Row, Col, Container, ListGroup, Button, Collapse } from "react-bootstrap";
 import PaginationComponent from "../../components/PaginationComponent";
 import ProductForListComponent from "../../components/ProductForListComponent";
 import SortOptionsComponent from "../../components/SortOptionsComponent";
@@ -13,9 +13,14 @@ const ProductListPageComponent = ({getProducts, categories}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [attrsFilter, setAttrsFilter] = useState([]);
+  const [attrsFilter, setAttrsFilter] = useState([]); //collect all attributes of category from db and show on the webpage 
   const {categoryName} = useParams() || "";
-
+  const [attrsFromFilter, setAttrsFromFilter] = useState([]); //collect all attributes of category from filter
+  const[filters, setFilters] = useState({}); //collect all filters
+  const [showResetFilterButton, setShowResetFilterButton] = useState(false);
+  const [price, setPrice] = useState(500);
+  const [rating, setRating] = useState({});
+  const [categoriesFromFilter, setCategoriesFromFilter] = useState({});
   useEffect(() => {
     if(categoryName) {
       let categoryAllData = categories.find((item) => item.name === categoryName.replaceAll(",", "/"))
@@ -39,8 +44,26 @@ const ProductListPageComponent = ({getProducts, categories}) => {
       })
       .catch(err => {
         setError(true)
-      })}
-    , []);
+      });
+      console.log("filter", filters);
+    }
+    , [filters]);
+
+  const handleFilters = () => {
+    setShowResetFilterButton(true);
+    setFilters({
+      price: price,
+      rating: rating,
+      categories: categoriesFromFilter,
+      attrs: attrsFromFilter
+    })
+  }
+  const resetFilter = () => {
+    
+    setShowResetFilterButton(false);
+    setFilters({});
+    window.location.href = "/product-list";
+  }
   return (
     <Container fluid>
       <Row>
@@ -52,24 +75,27 @@ const ProductListPageComponent = ({getProducts, categories}) => {
             
             <ListGroup.Item>
               Filter: <br />
-              <PriceFilterComponent />
+              <PriceFilterComponent price={price} setPrice={setPrice} />
             </ListGroup.Item>
             
             <ListGroup.Item>
-              <RatingFilterComponent />
+              <RatingFilterComponent setRating={setRating} rating={rating}/>
             </ListGroup.Item>
             
             <ListGroup.Item>
-              <CategoryFilterComponent />
+              <CategoryFilterComponent setCategoriesFromFilter={setCategoriesFromFilter} />
             </ListGroup.Item>
             
             <ListGroup.Item>
-              <AttributesFilterComponent attrsFilter = {attrsFilter} />
+              <AttributesFilterComponent attrsFilter = {attrsFilter} setAttrsFromFilter = {setAttrsFromFilter}/>
             </ListGroup.Item>
             
             <ListGroup.Item>
-              <Button variant="primary">Filter</Button> {" "}
-              <Button variant="danger">Rest Filter</Button>
+              <Button variant="primary" onClick={handleFilters}>Filter</Button> {" "}
+              {showResetFilterButton && (
+                <Button variant="danger" onClick={resetFilter}>Reset Filter</Button>
+              )}
+             
             </ListGroup.Item>
 
           </ListGroup>
