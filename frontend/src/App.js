@@ -48,7 +48,7 @@ function App() {
       try {
         await dispatch(getCategories());
         setIsCategories(true);
-        console.log("Categories loaded from app.js");
+        
       } catch (err) {
         console.error(err);
         setError("Failed to load categories. Please try again later.");
@@ -81,7 +81,13 @@ function App() {
             <Route path="/Login" element={<Login />} />
             <Route path="/Register" element={<Register />} />
             <Route path="/product-list" element={<ProductList />} />
+            <Route path="/product-list/:pageNumParam" element={<ProductList />} />
             <Route path="/product-list/category/:categoryName" element={<ProductList />} />
+            <Route path="/product-list/category/:categoryName/:pageNumParam" element={<ProductList />} />
+            <Route path="/product-list/search/:searchQuery" element={<ProductList />} />
+            <Route path="/product-list/search/:searchQuery/:pageNumParam" element={<ProductList />} />
+            <Route path="/product-list/category/:categoryName/search/:searchQuery" element={<ProductList />} />
+            <Route path="/product-list/category/:categoryName/search/:searchQuery/:pageNumParam" element={<ProductList />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/product-details/:id" element={<ProductDetails />} />
           </Route>

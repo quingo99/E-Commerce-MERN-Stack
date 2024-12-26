@@ -23,7 +23,8 @@ const HeaderComponent = () => {
     const dispatch = useDispatch();
     const {userInfo} = useSelector(state => state.userRegisterLogin);
     const itemCount = useSelector(state => state.cart.itemCount);
-
+    const categories = useSelector(state => state.category.categories);
+    console.log(categories);
    
     return <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
         <Container>

@@ -7,7 +7,7 @@ import {userRegisterLoginReducer} from "./reducers/userReducers"
 import {categoryListReducer} from "./reducers/categoryReducers"
 
 
-console.log("This is from store.js")
+
 const reducer = combineReducers({
     cart: cartReducer,
     userRegisterLogin: userRegisterLoginReducer,

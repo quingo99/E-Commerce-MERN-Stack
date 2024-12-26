@@ -12,8 +12,10 @@ cloudinary.config({
 
 const getProducts = async (req, res, next) => {
   try {
+
     const pageNum = Number(req.query.pageNum) || 1;
-    const totalProducts = await Product.countDocuments({});
+ 
+    let totalProducts = await Product.countDocuments({});
 
     //sort by name, price, etc
     let sort = {};
@@ -47,7 +49,7 @@ const getProducts = async (req, res, next) => {
 
       categoryQueryCondition = { category: regEx };
     }
-
+    
     //search from product list page
     if (req.query.category) {
       queryCondition = true;
@@ -62,31 +64,37 @@ const getProducts = async (req, res, next) => {
     //search by attribute
     //"Ram-4GB-8GB,Color-Red-Blue-Green"
     let attrsQueryCondition = [];
+   
+    
     if (req.query.attrs) {
       // attrs = Ram-1TB-2TB, color-blue-red
       attrsQueryCondition = req.query.attrs.split(",").reduce((acc, item) => {
         if (item) {
           let a = item.split("-");
+         
           let values = [...a];
           values.shift(); // remove first element of array;
           let a1 = {
             attrs: { $elemMatch: { key: a[0], value: { $in: values } } },
           };
           acc.push(a1);
-          console.dir(acc, { depth: null });
+          
           return acc;
         } else return acc;
       }, []);
+   
+
       queryCondition = true;
     }
 
     //this one for filter sort:
     const sortOption = req.query.sort || "";
+    
     if (sortOption) {
       let sortOpt = sortOption.split("_");
       //The square brackets around [sortOpt[0]] are used to create a dynamic key in the sort object.
       sort = { [sortOpt[0]]: Number(sortOpt[1]) };
-      console.log(sort);
+     
     }
 
     //search by bar
@@ -114,6 +122,8 @@ const getProducts = async (req, res, next) => {
           ...attrsQueryCondition,
         ],
       };
+      totalProducts = await Product.countDocuments(query);
+      
     }
 
     //number of product perpage
@@ -122,6 +132,7 @@ const getProducts = async (req, res, next) => {
       .skip(recordsPerPage * (pageNum - 1))
       .sort(sort)
       .limit(recordsPerPage);
+    
     res.json({
       products,
       pageNum,

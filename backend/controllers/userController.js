@@ -177,7 +177,8 @@ const writeReview = async (req, res, next) => {
             
         } else {
             //The reduce method applies a function against an accumulator and each element in the array (from left to right) to reduce it to a single output value. In this case, it's adding up all the elements of the array, starting from a sum of 0.
-            product.rating = prc.map((item) => Number(item.rating)).reduce((sum, item) => sum + item, 0) / product.reviews.length;
+            let ratingCalc = prc.map((item) => Number(item.rating)).reduce((sum, item) => sum + item, 0) / product.reviews.length;
+            product.rating = Math.round(ratingCalc);
         }
         product.reviewsNumber = product.reviews.length;
         console.log(product.reviews)
