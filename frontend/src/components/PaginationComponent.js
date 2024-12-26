@@ -6,9 +6,10 @@ const PaginationComponent = ({
   paginationLinksNumber,
   pageNum,
 }) => {
+  
   const category = categoryName ? `category/${categoryName}` : "";
   const search = searchQuery ? `search/${searchQuery}` : "";
-  const url = `/product-list`;
+  let url = `/product-list`;
   if (category) {
     url += `/${category}`;
   }

@@ -12,7 +12,7 @@ cloudinary.config({
 
 const getProducts = async (req, res, next) => {
   try {
-
+    
     const pageNum = Number(req.query.pageNum) || 1;
  
     let totalProducts = await Product.countDocuments({});
@@ -41,6 +41,7 @@ const getProducts = async (req, res, next) => {
     //search product for category
     let categoryQueryCondition = {};
     const categoryName = req.params.categoryName || "";
+    
     if (categoryName) {
       queryCondition = true;
       // console.log(categoryName);
@@ -91,6 +92,7 @@ const getProducts = async (req, res, next) => {
     const sortOption = req.query.sort || "";
     
     if (sortOption) {
+      
       let sortOpt = sortOption.split("_");
       //The square brackets around [sortOpt[0]] are used to create a dynamic key in the sort object.
       sort = { [sortOpt[0]]: Number(sortOpt[1]) };
@@ -98,7 +100,8 @@ const getProducts = async (req, res, next) => {
     }
 
     //search by bar
-    const searchQuery = req.params.searchQuery || "";
+    const searchQuery = req.query.searchQuery || "";
+    
     let searchQueryCondition = {};
     let select = {};
     if (searchQuery) {

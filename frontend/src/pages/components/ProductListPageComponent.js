@@ -35,6 +35,7 @@ const ProductListPageComponent = ({ getProducts, categories }) => {
   const { categoryName } = useParams() || "";
   const { pageNumParam } = useParams() || 1;
   const { searchQuery } = useParams() || "";
+  
   const location = useLocation();
   const navigate = useNavigate();
 

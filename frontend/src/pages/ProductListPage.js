@@ -47,7 +47,7 @@ const getProducts = async (
     }, ""
   )
   }
- 
+  console.log("searchQuery", categoryName);  
  
   const queryParams = new URLSearchParams({
     category,

@@ -10,10 +10,10 @@ import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 
 import { LinkContainer } from 'react-router-bootstrap';
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import { logout } from '../redux/action/userActions';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
 
@@ -23,9 +23,30 @@ const HeaderComponent = () => {
     const dispatch = useDispatch();
     const {userInfo} = useSelector(state => state.userRegisterLogin);
     const itemCount = useSelector(state => state.cart.itemCount);
-    const categories = useSelector(state => state.category.categories);
-    console.log(categories);
+    const {categories} = useSelector(state => state.categoryList);
+    
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const navigate = useNavigate();
    
+    const submitHandler = (e) => {
+        if(e.keyCode && e.keyCode !== 13) return;
+        e.preventDefault();
+        if(searchQuery.trim()){
+            if (selectedCategory === "All") {
+                navigate(`/product-list/search/${searchQuery}`);
+            }
+            else {
+                navigate(`/product-list/category/${selectedCategory.replaceAll("/","")}/search/${searchQuery}`);
+            }
+        }else if(selectedCategory !== "All"){
+            navigate(`/product-list/category/${selectedCategory.replaceAll("/","")}`);
+        } else{
+            navigate(`/product-list`);
+        }
+
+    }
     return <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
         <Container>
             {/*Help go back to the main page without reloading*/}
@@ -38,14 +59,15 @@ const HeaderComponent = () => {
             <Navbar.Collapse id="responsive-navbar-nav">
                 <Nav className="me-auto">
                     <InputGroup>
-                        <DropdownButton id="dropdown-basic-button" title="ALL">
-                            <Dropdown.Item>Electronics</Dropdown.Item>
-                            <Dropdown.Item>Books</Dropdown.Item>
-                            <Dropdown.Item>Cloths</Dropdown.Item>
-                            <Dropdown.Item>Accessories</Dropdown.Item>
+                        <DropdownButton id="dropdown-basic-button" title={selectedCategory}>
+                        <Dropdown.Item onClick={() => setSelectedCategory("All")}>All</Dropdown.Item>
+                            {categories.map((category, index) => (
+                                <Dropdown.Item key={index} onClick={() => setSelectedCategory(category.name)}>{category.name}</Dropdown.Item>
+                            ))}
+                           
                         </DropdownButton>
-                        <Form.Control type="text" placeholder="Search in our shop...." />
-                        <Button variant="warning"><i className="bi bi-search-heart"></i></Button>
+                        <Form.Control onKeyUp={submitHandler} type="text" placeholder="Search in our shop...." onChange={(e) => setSearchQuery(e.target.value)}/>
+                        <Button variant="warning"><i className="bi bi-search-heart" onClick={submitHandler}></i></Button>
                     </InputGroup>
                 </Nav>
 
